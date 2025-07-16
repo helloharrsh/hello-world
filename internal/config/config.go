@@ -1,7 +1,10 @@
 package config
 
 import (
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -20,6 +23,11 @@ type Config struct {
 
 // Load reads environment variables and sets config values with defaults
 func Load() *Config {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("⚠️  No .env file found or failed to load it. Proceeding with system env...")
+	}
+
 	return &Config{
 		Port:         getEnv("APP_PORT", "8080"),
 		DBUser:       getEnv("DB_USER", "root"),

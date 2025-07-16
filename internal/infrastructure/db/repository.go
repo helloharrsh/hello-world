@@ -76,3 +76,12 @@ func (r *Repository) GetAllVerifiedUsers() ([]*model.User, error) {
 
 	return users, nil
 }
+
+func (r *Repository) IsUserVerified(email string) (bool, error) {
+	var verified bool
+	err := r.DB.QueryRow(`SELECT verified FROM users WHERE email = ?`, email).Scan(&verified)
+	if err == sql.ErrNoRows {
+		return false, nil // not found → not verified
+	}
+	return verified, err
+}

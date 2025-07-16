@@ -22,10 +22,18 @@ func NewOTPService(repo *db.Repository, mailer *mail.Mailer) *OTPService {
 }
 
 func (s *OTPService) GenerateAndSendOTP(email string) error {
+	isVerified, err := s.Repo.IsUserVerified(email)
+	if err != nil {
+		return err
+	}
+	if isVerified {
+		return fmt.Errorf("email is already verified")
+	}
+
 	code := generateOTP()
 	expiry := time.Now().Add(5 * time.Minute)
 
-	err := s.Repo.SaveOTP(email, code, expiry)
+	err = s.Repo.SaveOTP(email, code, expiry)
 	if err != nil {
 		return err
 	}

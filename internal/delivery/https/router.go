@@ -15,6 +15,7 @@ func NewRouter(otpService *service.OTPService) http.Handler {
 		OTPService: otpService,
 	}
 
+	// API routes with /api prefix
 	router.HandleFunc("/request-otp", handler.RequestOTP).Methods("POST")
 	router.HandleFunc("/verify-otp", handler.VerifyOTP).Methods("POST")
 

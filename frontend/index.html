@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interview Question Sign-up</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Sign up for Daily Interview Questions</h2>
+
+    <div id="message" class="message"></div>
+
+    <!-- Email Form -->
+    <form id="emailForm">
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <button type="submit">Request OTP</button>
+    </form>
+
+    <!-- OTP Form (initially hidden) -->
+    <form id="otpForm" style="display: none;">
+      <input type="text" id="otp" placeholder="Enter OTP" required />
+      <button type="submit">Verify OTP</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

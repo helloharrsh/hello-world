@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 
 	"mailer_application/internal/config"
@@ -15,34 +16,40 @@ import (
 )
 
 func main() {
-	// Load .env
+	// Load .env file
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found. Using system env.")
 	}
 
+	// Load configuration
 	cfg := config.Load()
 
-	// DB connection
+	// Connect to MySQL
 	conn, err := db.NewMySQLConnection(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}
 	defer conn.Close()
 
-	// Initialize mailer
+	// Initialize dependencies
 	mailer := mail.NewMailer(cfg)
-
-	// Initialize repository
 	repo := db.NewRepository(conn)
-
-	// Initialize service
 	otpService := service.NewOTPService(repo, mailer)
 
-	// Setup routes
-	router := httpDelivery.NewRouter(otpService)
+	// Setup main router
+	r := mux.NewRouter()
 
-	log.Printf("Server running on port %s", cfg.Port)
-	if err := http.ListenAndServe(":"+cfg.Port, router); err != nil {
+	// Mount API routes under /api/
+	apiRouter := httpDelivery.NewRouter(otpService)
+	r.PathPrefix("/api/").Handler(http.StripPrefix("/api", apiRouter))
+
+	// Serve static frontend files
+	fs := http.FileServer(http.Dir("./frontend"))
+	r.PathPrefix("/").Handler(fs)
+
+	// Start server
+	log.Printf("✅ Server running at http://localhost:%s", cfg.Port)
+	if err := http.ListenAndServe(":"+cfg.Port, r); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }
